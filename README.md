@@ -1,5 +1,5 @@
-# cybercomponentsproject
-Cyber systems and components project
+# Cyber Components Project
+
 
 This is where we plan to collaborate on projects while we build our codebase. Looks pretty cool to be able to say we got x number of commits over the semester!
 
