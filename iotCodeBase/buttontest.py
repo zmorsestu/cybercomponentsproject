@@ -4,7 +4,7 @@ import time
 def button_callback(channel):
     print("Button was pushed!")
 
-GPIO.setmode(GPIO.BOARD)
+GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 GPIO.setup(2,GPIO.OUT)
 GPIO.setup(3,GPIO.OUT)
