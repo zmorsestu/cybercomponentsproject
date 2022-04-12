@@ -5,9 +5,9 @@ import glob
 import smtplib
 from time import sleep
 
-###from email.MIMEMultipart import MIMEMultipart
-###from email.MIMEText import MIMEText
-###from email.MIMEBase import MIMEBase
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
 from email import encoders
 
 sender = 'parkoff@student.uiwtx.edu'
@@ -22,24 +22,24 @@ prefix = 'image'
 ###GPIO.setup(15, GPIO.IN)  
 
 def send_mail(filename):
-    ###msg = MIMEMultipart()
-    ###msg['From'] = sender
-    ###msg['To'] = receiver
-    ###msg['Subject'] = 'Visitor'
+    msg = MIMEMultipart()
+    msg['From'] = sender
+    msg['To'] = receiver
+    msg['Subject'] = 'Visitor'
     
     body = 'Find the picture in attachments'
-    ###msg.attach(MIMEText(body, 'plain'))
+    msg.attach(MIMEText(body, 'plain'))
     attachment = open(filename, 'rb')
-    ###part = MIMEBase('application', 'octet-stream')
-    ###part.set_payload((attachment).read())
+    part = MIMEBase('application', 'octet-stream')
+    part.set_payload((attachment).read())
     encoders.encode_base64(part)
-   ## part.add_header('Content-Disposition', 'attachment; filename= %s' % filename)
-   ## msg.attach(part)
+    part.add_header('Content-Disposition', 'attachment; filename= %s' % filename)
+    msg.attach(part)
     server = smtplib.SMTP('smtp.gmail.com', 587)
     server.starttls()
     server.login(sender, password)
-    ###text = msg.as_string()
-    ###server.sendmail(sender, receiver, text)
+    text = msg.as_string()
+    server.sendmail(sender, receiver, text)
     server.quit()
 
 def capture_img():
