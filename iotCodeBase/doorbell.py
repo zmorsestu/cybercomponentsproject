@@ -6,28 +6,19 @@ import smtplib
 import boto3
 from time import sleep
 
-#from email.mime.multipart import MIMEMultipart
-#from email.mime.text import MIMEText
-#from email.mime.base import MIMEBase
-#from email import encoders
-
-sender = 'parkoff@student.uiwtx.edu'
-password = '***************'
-receiver = 'parkoff@student.uiwtx.edu'
-
 DIR = './Visitors/'
 prefix = 'image'
             
 GPIO.setwarnings(False)
-GPIO.setmode(GPIO.BOARD)
-GPIO.setup(11, GPIO.IN)  
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(17,GPIO.IN,pull_up_down=GPIO.PUD_DOWN)
 
 session = boto3.Session( #create session with keys, may need to be changed if outdated
-    aws_access_key_id="AKIAW3T63HVT24D5MC3", #access key ID
-    aws_secret_access_key="FO0z6yQhkAeRjFha+BpESM6AXI1JMFsp2kTSUpV2", #Secret access key
+    aws_access_key_id="AKIAW3T63HVTVY347BNM", #access key ID
+    aws_secret_access_key="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", #Secret access key
     )
 
-def send_mail(filename):
+def send_aws(filename):
     s3 = session.client("s3")
 
     s3.upload_file(
@@ -35,8 +26,9 @@ def send_mail(filename):
     Bucket="cybersystemsandcomponentsproject", #bucket it's going in
     Key=filename, #filename in bucket
     )
+    print("Upload Complete!")
 
-def capture_img():
+def capture_img(channel):
     print ('Capturing')
     if not os.path.exists(DIR):
         os.makedirs(DIR)
@@ -48,14 +40,7 @@ def capture_img():
     filename = os.path.join(DIR, prefix + '%03d.jpg' % count)
     with picamera.PiCamera() as camera:
        pic = camera.capture(filename)
-    send_mail(filename)
+    send_aws(filename)
+    
+GPIO.add_event_detect(17,GPIO.RISING,callback=capture_img)
 
-while True:
-    if (GPIO.input(11)):
-        print('ON')
-        sleep(0.4)
-        print('Capture')
-        capture_img()
-    else:
-        print('OFF')
-        sleep (0.4)
