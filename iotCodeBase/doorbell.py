@@ -1,14 +1,15 @@
 import os
 import glob
-###import picamera
-###import RPi.GPIO as GPIO
+import picamera
+import RPi.GPIO as GPIO
 import smtplib
+import boto3
 from time import sleep
 
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from email.mime.base import MIMEBase
-from email import encoders
+#from email.mime.multipart import MIMEMultipart
+#from email.mime.text import MIMEText
+#from email.mime.base import MIMEBase
+#from email import encoders
 
 sender = 'parkoff@student.uiwtx.edu'
 password = '***************'
@@ -17,30 +18,23 @@ receiver = 'parkoff@student.uiwtx.edu'
 DIR = './Visitors/'
 prefix = 'image'
             
-###GPIO.setwarnings(False)
-###GPIO.setmode(GPIO.BOARD)
-###GPIO.setup(15, GPIO.IN)  
+GPIO.setwarnings(False)
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(11, GPIO.IN)  
+
+session = boto3.Session( #create session with keys, may need to be changed if outdated
+    aws_access_key_id="AKIAW3T63HVT24D5MC3", #access key ID
+    aws_secret_access_key="FO0z6yQhkAeRjFha+BpESM6AXI1JMFsp2kTSUpV2", #Secret access key
+    )
 
 def send_mail(filename):
-    msg = MIMEMultipart()
-    msg['From'] = sender
-    msg['To'] = receiver
-    msg['Subject'] = 'Visitor'
-    
-    body = 'Find the picture in attachments'
-    msg.attach(MIMEText(body, 'plain'))
-    attachment = open(filename, 'rb')
-    part = MIMEBase('application', 'octet-stream')
-    part.set_payload((attachment).read())
-    encoders.encode_base64(part)
-    part.add_header('Content-Disposition', 'attachment; filename= %s' % filename)
-    msg.attach(part)
-    server = smtplib.SMTP('smtp.gmail.com', 587)
-    server.starttls()
-    server.login(sender, password)
-    text = msg.as_string()
-    server.sendmail(sender, receiver, text)
-    server.quit()
+    s3 = session.client("s3")
+
+    s3.upload_file(
+    Filename=filename, #filepath of file you're uploading
+    Bucket="cybersystemsandcomponentsproject", #bucket it's going in
+    Key=filename, #filename in bucket
+    )
 
 def capture_img():
     print ('Capturing')
@@ -52,15 +46,16 @@ def capture_img():
     if len(files) > 0:
         count = int(files[-1][-7:-4])+1
     filename = os.path.join(DIR, prefix + '%03d.jpg' % count)
-    ###with picamera.PiCamera() as camera:
-       ### pic = camera.capture(filename)
+    with picamera.PiCamera() as camera:
+       pic = camera.capture(filename)
     send_mail(filename)
 
 while True:
-       ##if in== GPIO.input(11):
-        ##if == 0:
-        print('Waiting'),i 
+    if (GPIO.input(11)):
+        print('ON')
         sleep(0.4)
-##elif == 1:  
-    ##print('Captured');"Sending", i
-    ###capture_img()
+        print('Capture')
+        capture_img()
+    else:
+        print('OFF')
+        sleep (0.4)
