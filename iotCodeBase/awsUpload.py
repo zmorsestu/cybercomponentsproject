@@ -1,7 +1,7 @@
 import boto3
 session = boto3.Session( #create session with keys, may need to be changed if outdated
-    aws_access_key_id="AKIAW3T63HVTVY347BNM", #access key ID
-    aws_secret_access_key="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", #Secret access key
+    aws_access_key_id="*****************", #access key ID
+    aws_secret_access_key="*******************", #Secret access key
 )
 
 s3 = session.client("s3")
