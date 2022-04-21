@@ -2,7 +2,6 @@ import os
 import glob
 import picamera
 import RPi.GPIO as GPIO
-import smtplib
 import boto3
 from time import sleep
 
